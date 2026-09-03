@@ -5,6 +5,7 @@ import {
   chatCompletionsUrl,
   endpointName,
   extractJson,
+  handleLocalEndpoint,
 } from "../js/modelGateway.js";
 
 test("未创建结构化简历时使用精简引导文本", () => {
@@ -38,4 +39,56 @@ test("OpenAI 兼容地址只追加一次 chat/completions", () => {
     chatCompletionsUrl("https://example.com/v1/chat/completions"),
     "https://example.com/v1/chat/completions",
   );
+});
+
+test("文档解析消息调用模型并返回结构化简历", async () => {
+  const previousChrome = globalThis.chrome;
+  const previousFetch = globalThis.fetch;
+  let requestBody;
+  globalThis.chrome = {
+    storage: {
+      local: {
+        async get() {
+          return {
+            localModelSettings: {
+              baseUrl: "https://example.com/v1",
+              model: "test-model",
+              apiKey: "test-key",
+            },
+          };
+        },
+      },
+    },
+  };
+  globalThis.fetch = async (_url, options) => {
+    requestBody = JSON.parse(options.body);
+    return {
+      ok: true,
+      async json() {
+        return {
+          choices: [
+            {
+              message: {
+                content: JSON.stringify({ basicInfo: { name: "测试用户" } }),
+              },
+            },
+          ],
+        };
+      },
+    };
+  };
+
+  try {
+    const result = await handleLocalEndpoint("parseResumeDocument", {
+      fileName: "resume.md",
+      sourceType: "markdown",
+      text: "姓名：测试用户。教育经历：示例大学计算机专业本科。",
+    });
+    assert.equal(result.basicInfo.name, "测试用户");
+    assert.equal(requestBody.model, "test-model");
+    assert.match(requestBody.messages[0].content, /禁止推测/);
+  } finally {
+    globalThis.chrome = previousChrome;
+    globalThis.fetch = previousFetch;
+  }
 });

@@ -31,10 +31,10 @@
         <button class="btn" id="exportBtn" type="button" title="导出备份">
           <span>📥 导出 JSON</span>
         </button>
-        <button class="btn" id="importBtn" type="button" title="导入简历">
-          <span>📤 导入 JSON</span>
+        <button class="btn" id="importBtn" type="button" title="导入 PDF、Markdown、TXT 或 JSON 简历">
+          <span>📤 导入简历</span>
         </button>
-        <input type="file" id="importFileInput" accept=".json" style="display:none">
+        <input type="file" id="importFileInput" accept=".pdf,.md,.markdown,.txt,.json,application/pdf,application/json,text/markdown,text/plain" style="display:none">
 
         <button class="btn btn-primary" id="saveManualBtn" type="button">
           <span>💾 保存数据</span>
@@ -115,6 +115,24 @@
 
   <!-- Toast Container -->
   <div class="toast-box" id="toastBox"></div>
+
+  <dialog class="import-dialog" id="importPreviewDialog">
+    <div class="import-dialog-card">
+      <div class="import-dialog-header">
+        <div>
+          <h3>确认导入简历</h3>
+          <p id="importPreviewMeta"></p>
+        </div>
+        <button class="dialog-close" id="importPreviewClose" type="button" aria-label="关闭">×</button>
+      </div>
+      <p class="import-dialog-notice">以下文本将用于结构化解析。手机号、邮箱和身份证号会先在本地替换为占位符；姓名、学校、公司等其他内容仍会发送给你配置的模型服务。</p>
+      <pre id="importPreviewText"></pre>
+      <div class="import-dialog-actions">
+        <button class="btn" id="importPreviewCancel" type="button">取消</button>
+        <button class="btn btn-primary" id="importPreviewConfirm" type="button">发送给模型并导入</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- External Script for Manifest V3 CSP Compliance -->
   <script type="module" src="../js/resume/editor.js"></script>

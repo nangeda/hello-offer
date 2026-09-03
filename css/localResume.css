@@ -193,6 +193,11 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Sego
 .btn:active {
   transform: scale(0.98);
 }
+.btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+  transform: none;
+}
 .btn-primary {
   background: var(--primary);
   border-color: var(--primary);
@@ -765,6 +770,84 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Sego
   gap: 8px;
   animation: slideIn 0.2s ease forwards;
 }
+
+/* Resume document import */
+.import-dialog {
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(760px, calc(100vh - 32px));
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--text-main);
+}
+.import-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(3px);
+}
+.import-dialog-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: min(760px, calc(100vh - 32px));
+  padding: 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.import-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.import-dialog-header h3 {
+  margin-bottom: 4px;
+  font-size: 18px;
+}
+.import-dialog-header p {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.dialog-close {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--border-light);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 22px;
+}
+.import-dialog-notice {
+  padding: 10px 12px;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  background: var(--warning-light);
+  color: #92400e;
+  font-size: 12px;
+  line-height: 1.6;
+}
+#importPreviewText {
+  min-height: 220px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text-secondary);
+  font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.import-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
 @keyframes slideIn {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
@@ -782,4 +865,3 @@ html, body { height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Sego
   .form-item.span-2, .form-item.span-3, .form-item.span-4 { grid-column: auto; }
   .hero-profile-card { flex-direction: column; align-items: flex-start; gap: 16px; }
 }
-

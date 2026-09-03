@@ -1,10 +1,10 @@
 {
   "name": "hello-offer",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "check": "node --check js/autofillRuntime.js && node --check js/floatingPanel.js && node --check js/background.js && node --check js/modelGateway.js && node --check js/popup.js && node --check js/resume/editor.js && node --check js/resume/schema.js && node --check js/resume/serializer.js && node --check js/resume/sanitize.js"
+    "check": "node --check js/autofillRuntime.js && node --check js/floatingPanel.js && node --check js/background.js && node --check js/modelGateway.js && node --check js/popup.js && node --check js/resume/editor.js && node --check js/resume/schema.js && node --check js/resume/serializer.js && node --check js/resume/sanitize.js && node --check js/resume/document-importer.js && node --check js/resume/pdf-extractor.js && node --check js/resume/pii-masker.js"
   }
 }

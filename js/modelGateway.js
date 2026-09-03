@@ -1,3 +1,5 @@
+import { emptyResume } from "./resume/schema.js";
+
 export const DEFAULT_SETTINGS = Object.freeze({
   baseUrl: "https://api.deepseek.com",
   model: "deepseek-chat",
@@ -158,6 +160,52 @@ async function fillValues(payload, settings, resumeMd) {
   return normalizeValues(result);
 }
 
+export function resumeImportTemplate() {
+  const template = emptyResume();
+  delete template.createdAt;
+  delete template.updatedAt;
+  return template;
+}
+
+async function parseResumeDocument(payload, settings) {
+  const text = String(payload?.text || "").trim();
+  if (text.length < 20) throw new Error("简历文本过短，无法解析");
+
+  const template = resumeImportTemplate();
+  const result = await fetchModel(
+    [
+      {
+        role: "system",
+        content: [
+          "你是中文求职简历结构化解析器。",
+          "必须严格依据原文提取，禁止推测、补写或美化；无法确认的字段保留空字符串、0、空数组或空对象。",
+          "输出必须是一个 JSON 对象，字段名与给定模板完全一致，不要添加解释或 Markdown 围栏。",
+          "经历数组只保留原文中实际存在的项目；日期尽量规范为 YYYY-MM 或 YYYY-MM-DD。",
+          "原文中的 {{MASK_*}} 是本地脱敏占位符，必须原样放入对应字段，不能修改或遗漏。",
+          `目标 JSON 模板：${JSON.stringify(template)}`,
+        ].join("\n"),
+      },
+      {
+        role: "user",
+        content: JSON.stringify({
+          fileName: payload?.fileName || "导入简历",
+          sourceType: payload?.sourceType || "text",
+          truncated: Boolean(payload?.truncated),
+          resumeText: text.slice(0, 40000),
+        }),
+      },
+    ],
+    settings,
+    10000,
+  );
+
+  const candidate = result?.resume || result?.data || result;
+  if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+    throw new Error("模型没有返回有效的结构化简历");
+  }
+  return candidate;
+}
+
 export async function initializeLocalState() {
   const stored = await chrome.storage.local.get([
     "localModelSettings",
@@ -230,6 +278,8 @@ export async function handleLocalEndpoint(name, payload = {}) {
     case "fillResumeValue":
     case "fillBlockResumeValue":
       return fillValues(payload, settings, resumeMd);
+    case "parseResumeDocument":
+      return parseResumeDocument(payload, settings);
     case "getBlankItem":
       return {
         items: (Array.isArray(payload?.blanks) ? payload.blanks : []).map(

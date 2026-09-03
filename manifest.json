@@ -3,7 +3,7 @@
   "name": "Hello Offer",
   "short_name": "Hello Offer",
   "description": "本地优先的智能简历填充助手",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "icons": {
     "16": "image/icon16.png",
     "32": "image/icon32.png",

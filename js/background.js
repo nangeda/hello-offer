@@ -68,6 +68,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ success: Array.isArray(result.fields), fields: result.fields });
           return;
         }
+        case "parseResumeDocument": {
+          const data = await handleLocalEndpoint(
+            "parseResumeDocument",
+            message.payload || {},
+          );
+          sendResponse({ success: true, data });
+          return;
+        }
         case "getSource":
           sendResponse({ source: null });
           return;

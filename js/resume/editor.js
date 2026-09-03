@@ -1,6 +1,12 @@
 import { resumeToMarkdown } from "./serializer.js";
 import { escapeHtml } from "./sanitize.js";
 import {
+  detectResumeFileType,
+  prepareResumeForModel,
+  readResumeSource,
+  restoreImportedResume,
+} from "./document-importer.js";
+import {
   FIELD_DEFINITIONS,
   MODULE_CONFIG,
   emptyBasicInfo,
@@ -186,6 +192,74 @@ import {
         reject(e);
       }
     });
+  }
+
+  function sendRuntimeMessage(message) {
+    return new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(message, (response) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
+        }
+        resolve(response);
+      });
+    });
+  }
+
+  function confirmImportPreview(source) {
+    const dialog = document.getElementById("importPreviewDialog");
+    const meta = document.getElementById("importPreviewMeta");
+    const preview = document.getElementById("importPreviewText");
+    const confirmBtn = document.getElementById("importPreviewConfirm");
+    const cancelBtn = document.getElementById("importPreviewCancel");
+    const closeBtn = document.getElementById("importPreviewClose");
+    if (!dialog || !meta || !preview || !confirmBtn || !cancelBtn || !closeBtn) {
+      return Promise.resolve(confirm("确认将该简历发送给已配置的模型进行结构化解析吗？"));
+    }
+
+    const typeLabel = source.sourceType === "pdf" ? "PDF" : "Markdown / TXT";
+    meta.textContent = `${source.fileName} · ${typeLabel} · ${source.text.length.toLocaleString()} 字符`;
+    preview.textContent = source.text.length > 12000
+      ? `${source.text.slice(0, 12000)}\n\n……预览仅显示前 12,000 字符……`
+      : source.text;
+    dialog.returnValue = "";
+
+    return new Promise((resolve) => {
+      confirmBtn.onclick = () => {
+        dialog.returnValue = "confirm";
+        dialog.close();
+      };
+      const cancel = () => {
+        dialog.returnValue = "cancel";
+        dialog.close();
+      };
+      cancelBtn.onclick = cancel;
+      closeBtn.onclick = cancel;
+      dialog.addEventListener(
+        "close",
+        () => resolve(dialog.returnValue === "confirm"),
+        { once: true },
+      );
+      dialog.showModal();
+    });
+  }
+
+  async function importJsonBackup(file) {
+    const parsed = JSON.parse((await file.text()).replace(/^\uFEFF/, "") || "{}");
+    if (Array.isArray(parsed.resumeList) && parsed.resumeList.length) {
+      state.resumeList = parsed.resumeList.map((item, index) => ({
+        name: item.name || `简历 ${index + 1}`,
+        data: mergeDefaults(item.data),
+      }));
+      state.activeIndex = Math.min(
+        Number(parsed.currentResumeIndex) || 0,
+        state.resumeList.length - 1,
+      );
+    } else {
+      state.resumeList[state.activeIndex].data = mergeDefaults(parsed.data || parsed);
+    }
+    renderAll();
+    await persist();
   }
 
   async function persist() {
@@ -747,36 +821,72 @@ import {
       };
     }
 
-    // Import JSON
+    // Import PDF, Markdown, text or a JSON backup.
     const importBtn = document.getElementById("importBtn");
     const fileInput = document.getElementById("importFileInput");
     if (importBtn && fileInput) {
       importBtn.onclick = () => fileInput.click();
-      fileInput.onchange = (e) => {
+      fileInput.onchange = async (e) => {
         const file = e.target.files && e.target.files[0];
         e.target.value = "";
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          try {
-            const parsed = JSON.parse(String(reader.result || "{}"));
-            if (Array.isArray(parsed.resumeList) && parsed.resumeList.length) {
-              state.resumeList = parsed.resumeList.map((item, i) => ({
-                name: item.name || `简历 ${i + 1}`,
-                data: mergeDefaults(item.data)
-              }));
-              state.activeIndex = Math.min(parsed.currentResumeIndex || 0, state.resumeList.length - 1);
-            } else {
-              state.resumeList[state.activeIndex].data = mergeDefaults(parsed.data || parsed);
-            }
-            renderAll();
-            persist();
-            toast("简历导入成功！", "success");
-          } catch (err) {
-            toast("导入失败: " + err.message, "error");
-          }
+        const originalHtml = importBtn.innerHTML;
+        const setBusy = (label) => {
+          importBtn.disabled = true;
+          importBtn.textContent = label;
         };
-        reader.readAsText(file);
+
+        try {
+          const fileType = detectResumeFileType(file.name);
+          if (fileType === "json") {
+            setBusy("⏳ 导入 JSON...");
+            await importJsonBackup(file);
+            toast("JSON 简历已导入", "success");
+            return;
+          }
+          if (fileType === "unknown") {
+            throw new Error("仅支持 PDF、Markdown、TXT 和 JSON 文件");
+          }
+
+          setBusy(fileType === "pdf" ? "⏳ 读取 PDF..." : "⏳ 读取文本...");
+          const source = await readResumeSource(file, {
+            onProgress: ({ finished, total }) => {
+              importBtn.textContent = `⏳ 提取 PDF ${finished}/${total}`;
+            },
+          });
+
+          importBtn.disabled = false;
+          importBtn.innerHTML = originalHtml;
+          if (!(await confirmImportPreview(source))) {
+            toast("已取消导入");
+            return;
+          }
+
+          setBusy("⏳ AI 正在整理...");
+          const { payload, piiMap } = prepareResumeForModel(source);
+          const response = await sendRuntimeMessage({
+            type: "parseResumeDocument",
+            payload,
+          });
+          if (!response?.success) {
+            throw new Error(response?.error || "模型解析失败");
+          }
+
+          const imported = restoreImportedResume(response.data, piiMap);
+          state.resumeList.push({
+            name: source.resumeName,
+            data: mergeDefaults(imported),
+          });
+          state.activeIndex = state.resumeList.length - 1;
+          renderAll();
+          await persist();
+          toast("简历已作为新版本导入，请核对字段", "success");
+        } catch (err) {
+          toast("导入失败: " + (err?.message || String(err)), "error");
+        } finally {
+          importBtn.disabled = false;
+          importBtn.innerHTML = originalHtml;
+        }
       };
     }
 
