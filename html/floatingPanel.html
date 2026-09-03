@@ -1,0 +1,39 @@
+<div id="resume-window">
+  <div class="resume-header">
+    <img src="" id="header-logo" alt="Hello Offer">
+    <h4>Hello Offer</h4>
+    <button class="minimize-button" aria-label="折叠"><i class="fas fa-chevron-down"></i></button>
+  </div>
+  <div class="resume-display">
+    <div class="job-info">
+      <input type="text" id="company-name" class="normal-bg" placeholder="公司简称">
+      <input type="text" id="position-name" class="normal-bg" placeholder="职位简称">
+    </div>
+    <div class="resume-content">
+      <div class="resume-field">
+        <label for="resume-version">当前简历</label>
+        <div class="beautify-resume" style="display:none">
+          <input type="checkbox" id="beautify-checkbox">
+          <label for="beautify-checkbox">禁用专岗美化</label>
+        </div>
+      </div>
+      <div id="resume-version" class="resume-version-dropdown">
+        <button type="button" class="resume-version-trigger" aria-haspopup="listbox" aria-expanded="false">
+          <span class="resume-version-label"></span>
+          <span class="resume-version-suffix"><span class="resume-version-prefix">本地</span></span>
+        </button>
+        <ul class="resume-version-list" role="listbox" hidden></ul>
+      </div>
+      <textarea id="resume-editor"></textarea>
+    </div>
+    <div class="quick-links">
+      <button id="my-resume-btn" class="quick-link-btn">打开本地简历编辑页</button>
+    </div>
+    <div id="version-notification" style="display:none"></div>
+  </div>
+  <div class="bottom-function">
+    <button id="start-button" aria-label="开始填写"><i class="fas fa-play"></i></button>
+    <div id="state-text">Hello Offer 准备中</div>
+    <button id="close-window" aria-label="关闭"><i class="fas fa-chevron-right"></i></button>
+  </div>
+</div>

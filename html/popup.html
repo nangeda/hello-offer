@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hello Offer</title>
+  <link rel="stylesheet" href="../css/popup.css">
+</head>
+<body>
+  <header>
+    <img src="../image/icon128.png" alt="">
+    <div><strong>Hello Offer</strong><small>智能填表 · 本地多简历</small></div>
+  </header>
+
+  <label>模型 Base URL<input id="base-url" type="url" placeholder="https://api.deepseek.com"></label>
+  <label>模型名称<input id="model" type="text" placeholder="deepseek-chat"></label>
+  <label>API Key<input id="api-key" type="password" autocomplete="off" placeholder="留空表示保持现有 Key"></label>
+
+  <div class="row">
+    <button id="save" class="primary">保存配置</button>
+    <button id="test">测试模型</button>
+  </div>
+  <button id="resume" class="wide">编辑本地简历</button>
+
+  <label class="mode">悬浮按钮
+    <select id="button-mode">
+      <option value="show">始终显示</option>
+      <option value="auto">智能显示</option>
+      <option value="hidden">隐藏</option>
+    </select>
+  </label>
+
+  <p id="status">使用 Hello Offer 智能填表流程；简历与模型配置保存在本机。</p>
+  <script type="module" src="../js/popup.js"></script>
+</body>
+</html>

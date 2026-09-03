@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hello Offer 简历中心</title>
+  <link rel="stylesheet" href="../css/localResume.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <a href="#" class="brand-logo">
+          <img class="logo-badge" src="../image/icon48.png" alt="">
+          <span>Hello Offer 简历中心</span>
+        </a>
+        <span class="badge-tag">本地纯净版 · 免登录</span>
+        
+        <!-- Resume Selector Tabs -->
+        <div class="resume-tabs" id="resumeTabs"></div>
+        <button class="tab-add-btn" id="addResumeBtn" title="新建一份简历">+</button>
+      </div>
+
+      <div class="header-actions">
+        <div class="save-indicator">
+          <span class="save-dot" id="saveDot"></span>
+          <span id="saveStatusText">已就绪</span>
+        </div>
+
+        <button class="btn" id="exportBtn" type="button" title="导出备份">
+          <span>📥 导出 JSON</span>
+        </button>
+        <button class="btn" id="importBtn" type="button" title="导入简历">
+          <span>📤 导入 JSON</span>
+        </button>
+        <input type="file" id="importFileInput" accept=".json" style="display:none">
+
+        <button class="btn btn-primary" id="saveManualBtn" type="button">
+          <span>💾 保存数据</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="app-body">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <!-- Completion Card -->
+        <div class="completion-card">
+          <div class="completion-header">
+            <span class="completion-title">简历完整度</span>
+            <span class="completion-percent" id="completionPercent">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="completionBar" style="width: 0%"></div>
+          </div>
+          <p class="completion-desc" id="completionTip">完善核心经历可显著提高网申匹配率</p>
+        </div>
+
+        <!-- Section Nav Links -->
+        <nav class="nav-list" id="sidebarNav"></nav>
+      </aside>
+
+      <!-- Content Area -->
+      <main class="content-area">
+        <!-- View Control Bar -->
+        <div class="view-control-bar">
+          <div class="view-tabs">
+            <button class="view-tab-btn active" id="viewEditTab" type="button">
+              <span>✏️ 结构化编辑</span>
+            </button>
+            <button class="view-tab-btn" id="viewPreviewTab" type="button">
+              <span>👁️ 简历标准排版预览</span>
+            </button>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-action-sm" id="expandAllBtn" type="button">全部展开</button>
+            <button class="btn btn-action-sm" id="collapseAllBtn" type="button">全部折叠</button>
+            <button class="btn btn-action-sm btn-danger-outline" id="deleteResumeBtn" type="button">删除当前简历</button>
+          </div>
+        </div>
+
+        <!-- Editor View Container -->
+        <div id="editorView" style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- Hero Profile Card -->
+          <div class="hero-profile-card">
+            <div class="hero-left">
+              <div class="hero-avatar" id="heroAvatar">用</div>
+              <div class="hero-info">
+                <h2 id="heroName">我的简历</h2>
+                <div class="hero-tags" id="heroTags">
+                  <span class="hero-tag highlight" id="heroTagJob">求职意向未填</span>
+                  <span class="hero-tag" id="heroTagEdu">学历未填</span>
+                  <span class="hero-tag" id="heroTagStatus">应届生</span>
+                </div>
+              </div>
+            </div>
+            <div class="hero-actions">
+              <button class="btn" id="renameResumeBtn" type="button">✏️ 重命名</button>
+            </div>
+          </div>
+
+          <!-- Dynamic Sections Container -->
+          <div id="sectionsContainer" style="display: flex; flex-direction: column; gap: 24px;"></div>
+        </div>
+
+        <!-- Preview View Container -->
+        <div id="previewView" style="display: none;">
+          <div class="preview-container" id="previewPaper"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-box" id="toastBox"></div>
+
+  <!-- External Script for Manifest V3 CSP Compliance -->
+  <script type="module" src="../js/resume/editor.js"></script>
+</body>
+</html>

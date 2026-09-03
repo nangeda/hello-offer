@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Hello Offer",
+  "short_name": "Hello Offer",
+  "description": "本地优先的智能简历填充助手",
+  "version": "0.6.0",
+  "icons": {
+    "16": "image/icon16.png",
+    "32": "image/icon32.png",
+    "48": "image/icon48.png",
+    "128": "image/icon128.png"
+  },
+  "action": {
+    "default_popup": "html/popup.html",
+    "default_icon": {
+      "16": "image/icon16.png",
+      "32": "image/icon32.png",
+      "48": "image/icon48.png",
+      "128": "image/icon128.png"
+    }
+  },
+  "permissions": ["tabs", "storage"],
+  "host_permissions": [
+    "https://*/*",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": ["<all_urls>"],
+      "resources": [
+        "html/floatingPanel.html",
+        "css/lib/simplemde.min.css",
+        "css/lib/font-awesome.all.min.css",
+        "css/floatingPanel.css",
+        "webfonts/*",
+        "image/icon128.png"
+      ]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "js/lib/simplemde.min.js",
+        "js/autofillRuntime.js",
+        "js/floatingPanel.js"
+      ],
+      "css": ["css/web.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": {
+    "service_worker": "js/background.js",
+    "type": "module"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

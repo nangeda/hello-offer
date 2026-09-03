@@ -1,0 +1,54 @@
+
+/* 高亮背景颜色 - 根据开关状态自动切换 */
+:root {
+
+  --highlight-yellow: #ffffff00;
+  --highlight-green: #ffffff00;
+  --highlight-red: #ffffff00;
+  --highlight-blue: #ffffff00;
+  --highlight-purple: #ffffff00;
+} 
+
+/* 当开启高亮时的颜色 */
+:root[style*="--highlight-enabled: 1"] {
+  --highlight-yellow: #feffaf99;
+  --highlight-green: #ebfeef99;
+  --highlight-red: #ffe6e199;
+  --highlight-blue: #e8f2ff99;
+  --highlight-purple: #e1e1ff99;
+}
+
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-green {
+  background-color: var(--highlight-green) !important;
+}
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-green * {
+  background-color: #ffffff00 !important;
+}
+
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-yellow {
+  background-color: var(--highlight-yellow) !important;
+}
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-yellow * {
+  background-color: #ffffff00 !important;
+}
+
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-red {
+  background-color: var(--highlight-red) !important;
+}
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-red * {
+  background-color: #ffffff00 !important;
+}
+
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-blue {
+  background-color: var(--highlight-blue) !important;
+}
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-blue * {
+  background-color: #ffffff00 !important;
+}
+
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-purple {
+  background-color: var(--highlight-purple) !important;
+}
+:root[style*="--highlight-enabled: 1"] .hello-offer-mark-purple * {
+  background-color: #ffffff00 !important;
+}
