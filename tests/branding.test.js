@@ -50,3 +50,12 @@ test("Manifest 引用的本地文件均存在", () => {
     assert.equal(fs.existsSync(path.join(root, reference)), true, reference);
   }
 });
+
+test("悬浮窗通过后台打开简历中心", () => {
+  const panel = fs.readFileSync(path.join(root, "js/floatingPanel.js"), "utf8");
+  const background = fs.readFileSync(path.join(root, "js/background.js"), "utf8");
+  assert.match(panel, /type:\s*["']openResumeEditor["']/);
+  assert.doesNotMatch(panel, /window\.open\(window\.config\.WEB_URL/);
+  assert.match(background, /case\s+["']openResumeEditor["']/);
+  assert.match(background, /chrome\.tabs\.create/);
+});

@@ -323,7 +323,9 @@
               ? (o.detail && "用户没有简历" === o.detail
                   ? (await c(!1),
                     confirm("还没有可用简历，是否打开本地简历中心？") &&
-                      window.open(`${window.config.WEB_URL}`, "_blank"))
+                      openResumeEditor().catch(() =>
+                        window.setStateText("无法打开简历中心", "show"),
+                      ))
                   : window.setStateText(
                       "糟糕！简历请求失败，刷新再试试",
                       "min",
@@ -654,6 +656,11 @@
       return { status: "error", detail: e.message || "未知错误" };
     }
   }
+  async function openResumeEditor() {
+    const e = await chrome.runtime.sendMessage({ type: "openResumeEditor" });
+    if (!e?.success) throw new Error(e?.error || "无法打开简历中心");
+    return e;
+  }
   function T() {
     const e = n.querySelector("#history-table-btn"),
       t = n.querySelector("#campus-table-btn"),
@@ -667,8 +674,12 @@
           window.open(window.config.CAMPUS_URL, "_blank");
         }),
       o &&
-        o.addEventListener("click", () => {
-          window.open(window.config.WEB_URL, "_blank");
+        o.addEventListener("click", async () => {
+          try {
+            await openResumeEditor();
+          } catch (e) {
+            window.setStateText(e?.message || "无法打开简历中心", "show");
+          }
         }));
   }
   async function I(t) {

@@ -76,6 +76,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           sendResponse({ success: true, data });
           return;
         }
+        case "openResumeEditor": {
+          const tab = await chrome.tabs.create({
+            url: chrome.runtime.getURL("html/localResume.html"),
+          });
+          sendResponse({ success: true, tabId: tab?.id });
+          return;
+        }
         case "getSource":
           sendResponse({ source: null });
           return;
